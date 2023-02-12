@@ -35,7 +35,6 @@ function _myNew(fn,...args){
     if(typeof fn !== 'function') throw new Error('the first parameter is not a function');
     //1.创建一个空的对象
     const newObj = Object.create({});
-    console.log([].shift.call(arguments))
     //判断fn的原型对象是否为空
     if(fn.prototype){
         //2.将上述步骤创建的newObj的隐性原型属性指向构造函数的原型对象。
