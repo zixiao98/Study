@@ -1,6 +1,9 @@
 /**
  * 给定两个数字，输出其相加的结果
- * 
+ * 思路：
+ *     1.两个数字可能长度不同，需要对其补0，使其长度相同
+ *     2.将其转成两个字符串数组，对两个数组的每一个项进行对应相加，并加上进位，记录进位是否产生进位
+ *     3.完成相加之后，检查最后是否产生了一个进位，是的话，最后得补上进位的1。
  */
 function BigNumSum(NumA, NumB) {
     //边界处理
@@ -10,7 +13,7 @@ function BigNumSum(NumA, NumB) {
     let stringA = String(NumA);
     let stringB = String(NumB);
 
-    //比较长度，进行补0操作
+    //比较长度，进行补0操作，并分隔成字符串数组
     let ZeroLen = stringA.length > stringB.length ? stringA.length : stringB.length;
     let NumAarr = stringA.padStart(ZeroLen, '0').split('');
     let NumBarr = stringB.padStart(ZeroLen, '0').split('');
