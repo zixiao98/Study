@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <style>
+        .progress1{
+            margin: 10px 0;
+            width: 100%;
+            height: 20px;
+            border: 1px solid red;
+        }
+        #progress1{
+            width: 0%;
+            height: 100%;
+            background-color: red;
+            text-align: center;
+        }
+        .progress2{
+            margin: 10px 0;
+            margin-left: 50px;
+            width: 300px;
+            height: 300px;
+            border: 1px solid red;
+            border-radius: 50%;
+            overflow: hidden;
+            /* 由于浏览器渲染是从上往下的，所以，当我们旋转父元素后，看起来就是从下往上了 */
+            transform-origin: center;
+            transform:rotate(180deg) ; 
+        }
+        #progress2{
+            height: 0;
+            width: 100%;
+            background-color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="progress">
+        <div id="progress" class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+          <span class="sr-only">40% Complete (success)</span>
+        </div>
+    </div>
+    <div class="progress1">
+        <div id="progress1">
+            <span id="progressText"></span>
+        </div>
+    </div>
+    <div>
+        <span id="progressText1"></span>
+        <div class="progress2">
+            <div id="progress2">
+                <span id="progressText1"></span>
+            </div>
+        </div>
+    </div>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <script>
+        function quest(url) {
+            //返回一个promise
+            return new Promise(async (res,rej)=>{
+                const resq = await fetch(url,{
+                    method:'GET',
+                    body:null
+                })
+                //获取数据总量
+                const total = resq.headers.get('content-length')//从响应头的‘content-length’字段获取
+                //获取响应体的阅读器
+                const reader = resq.body.getReader();
+                //加载量
+                let loaded =0;
+
+                const progress = document.getElementById('progress');
+                const progress1 = document.getElementById('progress1');
+                const progress2 = document.getElementById('progress2');
+                const progressText = document.getElementById('progressText');
+                const progressText1 = document.getElementById('progressText1');
+                let myTime = 200;
+
+                //进度实现
+                while(true){
+                    const { done,value } = await reader.read();//reder.read()返回了一个promise，解构赋值出done和value
+                    //传输完成，结束循环
+                    if(done) break;
+                    loaded += value.length;
+                    const lv =loaded/total*100;
+                    //插件进度bs
+                    progress.setAttribute('aria-valuenow',lv);
+                    progress.style.width =` ${lv}%`;
+                    //梯度提升加载速度
+                    if(lv>80) myTime = 100;
+                    if(lv>50) myTime = 150;
+                    //定时器，起缓速加载的视觉效果。
+                    let timer = null;
+                    if(timer) clearTimeout(timer);
+                    timer=setTimeout(()=>{
+                        //条形进度
+                        progress1.style.width =` ${lv}%`;
+                        progressText.innerText = lv.toFixed(2) + '%';
+                        //水球进度
+                        progress2.style.height =`${lv}%`;
+                        progressText1.innerText = lv.toFixed(2) + '%';
+                    },myTime);
+                }
+            })
+        }
+        quest("https://api.btstu.cn/sjbz/api.php")
+    </script>
+</body>
+
+</html>
