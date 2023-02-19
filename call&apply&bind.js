@@ -44,18 +44,29 @@ Function.prototype._myBind = function (newObj, ...args) {
 
     return function(...OtherArgs){
         const ret = newObj[sym](...args,...OtherArgs);
-        delete newObj[sym];//只能调用一次，这个版本pass
+        delete newObj[sym];//只能调用一次，这个版本pass,不删除属性，可以重复调用，但是会给newObj增加了一个本来不存在的属性
         return ret;
     }
 }
+Function.prototype._myBind2 = function(newObj,...args){
+    //边界处理
+    if(typeof this !== 'function') throw new Error(`the ${this.name} is not a function`)
+    if(typeof newObj !== 'object' && newObj !=null) throw new Error('the first parameter is not a object')
+    let self = this;
+    return function(...otherArgs){
+        let res = self.apply(newObj,[...args,...otherArgs])
+        return res;
+    }
+}
+
 
 class MyC {
     name = 'MyC';
     static fnc = mySay
 }
-function mySay(){
-    console.log(this.name)
+function mySay(number){
+    console.log(this.name,number)
 }
-const myFN = MyC.fnc._myBind({name:'MyA'});
+const myFN = MyC.fnc._myBind2({name:'MyA'},123);
 myFN()
-myFN()//Error
+myFN()//_myBind 报错 _myBind2正常执行
