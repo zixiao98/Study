@@ -6,10 +6,10 @@
  * 
  */
 
-Function.prototype._myCall = function (newObj, ...args) {
+Function.prototype._myCall = function (newObj = window, ...args) {
     //边界处理(newObj可能为非真值对象)
     if (typeof newObj !== 'object') throw new Error('the first parameter is not a object')
-    newObj = newObj || window;
+    // newObj = newObj || window;//改用参数默认值
     //将这个fn，作为newObj的一个新属性
     let sym = Symbol('sym');
     newObj[sym] = this;
@@ -19,10 +19,10 @@ Function.prototype._myCall = function (newObj, ...args) {
     delete newObj[sym];
     return ret;
 }
-Function.prototype._myApply = function (newObj, args) {
+Function.prototype._myApply = function (newObj = window, args) {
     //边界处理(newObj可能为非真值对象)
     if (typeof newObj !== 'object') throw new Error('the first parameter is not a object')
-    newObj = newObj || window;
+    // newObj = newObj || window;
     //将这个fn，作为newObj的一个新属性
     let sym = Symbol('sym');
     newObj[sym] = this;
@@ -52,10 +52,14 @@ Function.prototype._myBind2 = function(newObj,...args){
     //边界处理
     if(typeof this !== 'function') throw new Error(`the ${this.name} is not a function`)
     if(typeof newObj !== 'object' && newObj !=null) throw new Error('the first parameter is not a object')
-    let self = this;
-    return function(...otherArgs){
-        let res = self.apply(newObj,[...args,...otherArgs])
-        return res;
+    // let self = this;
+    // return function(...otherArgs){
+    //     let res = self.apply(newObj,[...args,...otherArgs])
+    //     return res;
+    // }
+    //改用箭头函数没有this的特性，箭头函数里面的this实际上是外层环境中的this，并且是在定义的时候的确定
+    return (...otherArgs)=>{
+        return this.apply(newObj,[...args,...otherArgs])
     }
 }
 
