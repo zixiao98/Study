@@ -29,4 +29,4 @@ function curry(fn, ...args) {
     }
 
 }
-console.log(curry(add,111)(12,31,4))
+console.log(curry(add,111)(12,31,42))
