@@ -19,9 +19,10 @@ console.log(_flat(arr))
 
 //手写版 - 参加拍平层数
 function _flat2(arr, deep) {
+    if(deep <=0) return arr
     let res = [];
     for (let i = 0; i < arr.length; i++) {
-       if(Array.isArray(arr[i]) && deep > 0){
+       if(Array.isArray(arr[i])){
           res =  res.concat(_flat2(arr[i],deep - 1))//这里记得给res重新赋值，因为concat返回的是新数组，不会改变原数组
        }else{
         res.push(arr[i])
@@ -29,4 +30,4 @@ function _flat2(arr, deep) {
     }
     return res
 }
-console.log(_flat2(arr,5))
+console.log(_flat2(arr,3))
