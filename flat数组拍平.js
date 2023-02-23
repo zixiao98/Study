@@ -19,15 +19,35 @@ console.log(_flat(arr))
 
 //手写版 - 参加拍平层数
 function _flat2(arr, deep) {
-    if(deep <=0) return arr
+    if (deep <= 0) return arr
     let res = [];
     for (let i = 0; i < arr.length; i++) {
-       if(Array.isArray(arr[i])){
-          res =  res.concat(_flat2(arr[i],deep - 1))//这里记得给res重新赋值，因为concat返回的是新数组，不会改变原数组
-       }else{
-        res.push(arr[i])
-       } 
+        if (Array.isArray(arr[i])) {
+            res = res.concat(_flat2(arr[i], deep - 1)) //这里记得给res重新赋值，因为concat返回的是新数组，不会改变原数组
+        } else {
+            res.push(arr[i])
+        }
     }
     return res
 }
-console.log(_flat2(arr,3))
+console.log(_flat2(arr, 3))
+//concat可以展开一层的特性
+function _flatSp(arr) {
+    if (!Array.isArray(arr)) throw new TypeError('the parameter is not a array');
+    let res = [];
+    for (const item of arr) {
+        res = res.concat(Array.isArray(item) ? _flatSp(item) : item)
+    }
+    return res;
+}
+console.log(_flatSp(arr))
+//利用展开运算符可以开展一层的特性
+function SpreadFlat(arr) {
+    if(!Array.isArray(arr)) throw new TypeError('the parameter is not a array');
+    let res = [];
+    for (const item of arr) {
+        res = Array.isArray(item) ? [...res,...SpreadFlat(item)] : [...res,item]
+    }
+    return res
+}
+console.log(SpreadFlat(arr))
