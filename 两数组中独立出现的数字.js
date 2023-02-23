@@ -19,11 +19,11 @@ let foo = (a, b) => [...unIncludes(a, b), ...unIncludes(b, a)]
 //         return !arrB.includes(e)
 //     })
 // }
-//简写
+//简写 - 独立出现，那就是说，a有，b没有，逆向思维，找出双方在对面没有出现过的item
 let unIncludes = (a, b) => a.filter(e => !b.includes(e))
 
 
-//另一种写法
+//另一种写法 合并之后，找出index和lastIndex一致的item即是独立出现的item
 let res = [...a, ...b].filter((e, _, arr) => arr.lastIndexOf(e) == arr.indexOf(e))
 
 console.log(foo(a, b))
