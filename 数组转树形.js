@@ -126,7 +126,7 @@ function MaptoTree(arr, map = new Map()) {
         map.set(e.id, {...e})//这里使用展开运算符克隆了对象
     })
     //给map每一项找父亲
-    let keys = [...map.keys()]
+    let keys = [...map.keys()]//重要：保存了最原始的keys
     for (const [k, v] of map) {
         if (keys.includes(v.parentId)) {
             //找到父节点
@@ -138,7 +138,7 @@ function MaptoTree(arr, map = new Map()) {
     // console.log(map)
     //将根节点单独挑选出来
     for (const [k, v] of map) {
-        if (keys.includes(v.parentId)) map.delete(k)
+        if (keys.includes(v.parentId)) map.delete(k)//这里需要在之前保存的keys中查找，不能用map.has(v.parentId)因为map删除了一些项
     }
     return [...map.values()]
 
