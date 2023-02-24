@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="btn">按我</button>
+    <script>
+        //防抖 ->利用闭包长存内存中的特性和定时器延迟执行函数
+        /**
+         * 什么是防抖
+         *      连续操作时不触发，等最后一个操作完成一段时候后再触发
+         * 有什么作用：
+         *      避免函数多次执行，降低性能消耗，减少网络请求次数，节省网络带宽
+         * 使用场景：
+         *      搜索框的搜索信息联想，连续点击按钮只想触发一次的情景
+         * 实现思路：
+         *      设置定时器，如果在定时器时间没有走完重复触发了事件，则重置定时器，否则走完定时器执行回调函数
+         * 
+        */
+        function debounce(fn,delay,...args){
+            let timer = null;
+            return (...otherArr)=>{
+                if(timer) clearTimeout(timer);
+                timer = setTimeout(() => {
+                    fn.call(this,...args,...otherArr)
+                }, delay);
+            }
+        }
+        
+        //节流 ->利用闭包长存内存中的特性和重置时间与间隔判断来实现
+        /**
+         * 什么是节流
+         *      是指在一定间隔内只能执行一次该函数，如果后次执行与前次已执行的间隔少于设置间隔值，则不执行后次函数，
+         *      若大于则执行，并且重新时间间隔的起点为该次函数的执行的时间点
+         * 有什么作用
+         *      确保一定时间间隔内只能执行一次操作，用于减少操作的频次，降低性能消耗，减少网络请求次数，节省网络带宽
+         * 使用场景：
+         *      连续点击按钮时按照一定频次执行（浏览器的resize,scroll事件）
+         * 实现思路：
+         *      设置一个时间间隔起点，利用闭包，使其长存内存中，执行返回函数时，取执行时间与时间间隔起点的差与传入的时间设置比较，
+         *      如果大于，则执行函数，并将当前执行时间赋值给时间间隔起点。
+        */
+        function throttle(fn,interval,...args){
+            let time  = 0;//时间间隔起点
+            return (...otherArr)=>{
+                //获取当前时间
+                let curTime  = new Date().getTime();
+                //判断是否可以执行函数
+                if(curTime - time >= interval){
+                    fn.call(this,...args,...otherArr)
+                    //重置间隔起点
+                    time = curTime
+                }
+            }
+        }
+        //测试函数
+        function delog(...args){
+            console.log(`我被执行了`)
+        }
+        let btn = document.getElementById('btn');
+        // btn.addEventListener('click',debounce.call(btn,delog,500,6666))//debounce(delog,2000,6666)绑定的this是window
+        window.addEventListener('resize',throttle(delog,50,6666))
+    </script>
+</body>
+</html>
