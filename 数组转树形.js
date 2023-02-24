@@ -92,11 +92,13 @@ function _toTree(arr, flags = true, rootNode = [], ret = []) {
 //第二代方法(递归)
 //找出所有根节点
 function getRootNode(arr) {
-    let res = [];
-    arr.forEach(e => {
-        if (arr.every(item => item.id != e.parentId)) res.push(e);
-    })
-    return res;
+    // let res = [];
+    // arr.forEach(e => {
+    //     if (arr.every(item => item.id != e.parentId)) res.push(e);
+    // })
+    // return res;
+    //优化 ->过滤出数组所有项的id都没有对应其父id的项就是根节点
+    return arr.filter(e => arr.every(es => es.id !== e.parentId))
 }
 //递归找出根节点的所有后代节点
 function _toTreeUpdate(arr, rootNode = getRootNode(arr), ret = []) {
@@ -123,10 +125,12 @@ function _toTreeUpdate(arr, rootNode = getRootNode(arr), ret = []) {
 function MaptoTree(arr, map = new Map()) {
     //将所有的项，写入map
     arr.forEach(e => {
-        map.set(e.id, {...e})//这里使用展开运算符克隆了对象
+        map.set(e.id, {
+            ...e
+        }) //这里使用展开运算符克隆了对象
     })
     //给map每一项找父亲
-    let keys = [...map.keys()]//重要：保存了最原始的keys
+    let keys = [...map.keys()] //重要：保存了最原始的keys
     for (const [k, v] of map) {
         if (keys.includes(v.parentId)) {
             //找到父节点
@@ -138,7 +142,7 @@ function MaptoTree(arr, map = new Map()) {
     // console.log(map)
     //将根节点单独挑选出来
     for (const [k, v] of map) {
-        if (keys.includes(v.parentId)) map.delete(k)//这里需要在之前保存的keys中查找，不能用map.has(v.parentId)因为map删除了一些项
+        if (keys.includes(v.parentId)) map.delete(k) //这里需要在之前保存的keys中查找，不能用map.has(v.parentId)因为map删除了一些项
     }
     return [...map.values()]
 
