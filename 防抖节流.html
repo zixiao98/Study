@@ -43,6 +43,9 @@
          * 实现思路：
          *      设置一个时间间隔起点，利用闭包，使其长存内存中，执行返回函数时，取执行时间与时间间隔起点的差与传入的时间设置比较，
          *      如果大于，则执行函数，并将当前执行时间赋值给时间间隔起点。
+         *      or
+         *      设置一个标志，一开始置false，当触发函数时，判断这个标识是否为true，是的话，表明还在间隔内，不能执行该函数，
+         *      反之，标志为false，说明可以执行函数，把标志改为true并设置一个定时器，传入时间间隔的值，回调函数中执行操作，并将标志置为false
         */
         function throttle(fn,interval,...args){
             let time  = 0;//时间间隔起点
@@ -57,12 +60,25 @@
                 }
             }
         }
+        function throttle(fn,interval,...args){
+            let flag = false;//未有间隔
+            return (...otherArr)=>{
+                if(flag) return;//还在间隔内，不执行
+                // fn.call(this,...args,...otherArr);//立即执行第一个
+                flag =true;
+                setTimeout(()=>{
+                    flag =false;
+                    fn.call(this,...args,...otherArr);//延迟执行第一个
+                },interval)
+            }
+        }
         //测试函数
         function delog(...args){
             console.log(`我被执行了`)
         }
         let btn = document.getElementById('btn');
         // btn.addEventListener('click',debounce.call(btn,delog,500,6666))//debounce(delog,2000,6666)绑定的this是window
+        btn.addEventListener('click',throttle.call(btn,delog,5000,6666))//throttle(delog,2000,6666)绑定的this是window
         window.addEventListener('resize',throttle(delog,50,6666))
     </script>
 </body>
