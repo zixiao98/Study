@@ -61,13 +61,16 @@
             }
         }
         function throttle(fn,interval,...args){
-            let flag = false;//未有间隔
+            // let flag = false;//未有间隔
+            let timer = null;
             return (...otherArr)=>{
-                if(flag) return;//还在间隔内，不执行
+                // if(flag) return;//还在间隔内，不执行
+                if(timer) return;//定时器的时间传入的是时间间隔，所以当定时器还在说明定时器还在
                 // fn.call(this,...args,...otherArr);//立即执行第一个
-                flag =true;
-                setTimeout(()=>{
-                    flag =false;
+                flag =true;//delete
+                timer= setTimeout(()=>{
+                    // flag =false;//delete
+                    clearTimeout(timer)//改为清除定时器
                     fn.call(this,...args,...otherArr);//延迟执行第一个
                 },interval)
             }
