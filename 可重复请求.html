@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // async function request(url, maxCount) {
+        //     maxCount--;
+        //     let controller = new AbortController();
+        //     let signal = controller.signal;
+        //     let flag = false;
+        //     let ret = null;
+        //     try {
+        //         ret = await Promise.race([fetchs(url, signal), timeOutPrimse(controller)])
+        //             .then(res => res)
+        //         flag = true
+        //     } catch (err) {
+        //         console.log(err, '重试机会还有：' + maxCount)
+        //         if (maxCount <= 0) return Promise.reject(err);
+        //         return request(url, maxCount);
+        //     }
+        //     if (flag) return Promise.resolve(ret)
+        // }
+        // let fetchs = (url, signal) => {
+        //     return fetch(url, {
+        //         signal: signal
+        //     })
+        // }
+        // let timeOutPrimse = (controller) => {
+        //     return new Promise((res, rej) => {
+        //         setTimeout(() => {
+        //             rej('我超时了');
+        //             controller.abort()
+        //         }, 300)
+        //     })
+        // }
+        // let res = request('https://api.btstu.cn/sjbz/api.php', 6)
+        // res.then(res => {
+        //     console.log(res)
+        // }, err => console.log(err))
+        /**
+         * 可以重试的请求方法
+         * 发送请求，返回Promise
+         * 
+         * @param {*} url 请求地址
+         * @param {*} maxCount 最多请求次数
+         */
+        async function request(url, maxCount) {
+            maxCount--; //可重试次数减一
+            let controller = new AbortController; //AbortController 接口表示一个控制器对象，允许你根据需要中止一个或多个 Web 请求。
+            let signal = controller.signal; //获取 AbortSignal 实例对象，用于将fetch与controller链接起来，fetch需要设置上，{signal:signal}
+            try {
+                //执行请求
+                // let res = await fetch(url).then(res=>res);//异步变同步
+                let res = await Promise.race([fetch(url, {
+                    signal: signal
+                }), timeOutPromise(1000, controller)]);
+                return Promise.resolve(res);
+            } catch (err) {
+                console.log(maxCount)
+                if (maxCount <= 0) return Promise.reject(err)
+                return request(url, maxCount)
+            }
+        }
+        //使用Promise.race模拟超时
+        let timeOutPromise = (time, ctl) => {
+            return new Promise((_, reject) => {
+                setTimeout(() => {
+                    reject(`您已超时，超时为：${time}`)
+                    ctl.abort() //使用controller的abort方法终止
+                }, time)
+            })
+        }
+        // let res = request('https://api.btstu.cn/sjbz/api.php', 6)
+        // // let res = request('https://asdasaaadasd.com', 6)
+        // res.then(res => {
+        //     console.log(res)
+        // }).catch(err => alert(`错误信息：${err}ms`))
+
+        //简单代码版本
+        function req(url, maxCount) {
+            //如果fetch成功，直接返回，失败则走catch
+            return fetch(url).catch(err => maxCount <= 0 ? Promise.reject(err) : req(url, maxCount - 1))
+        }
+        let reqs = req('https://api.btstu.cn/sjbz/api.php', 6)
+        // let res = request('https://asdasaaadasd.com', 6)
+        reqs.then(res => {
+            console.log(res)
+        }).catch(err => alert(`错误信息：${err}ms`))
+    </script>
+</body>
+
+</html>
