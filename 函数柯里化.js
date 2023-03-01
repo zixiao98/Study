@@ -33,7 +33,7 @@ function curry(fn, ...args) {
         if(alen.length < fn.length){
             //继续收集参数
             // return curried(...alen,...others)这样是不行的， 要保证返回的是一个函数，这个函数需要返回结果，而不是一个函数运行的结果
-            return (...others)=>{
+            return (...others)=>{//参数收集函数，辅助curried函数进行参数收集，并返回currid的结果
                 return curried(...alen,...others)
             }
         }else {
