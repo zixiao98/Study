@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        body {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="btn">创建</button>
+    <script>
+        /**
+         * 实现Storage，使得该对象为单例，基于 localStorage 进行封装。实现方法 setItem(key,value) 和 getItem(key)。
+         */
+        class Storage {
+            constructor(name) {
+                this.name = name
+            }
+            //静态方法
+            static getInstance(name){
+                if(!Storage.instance) Storage.instance = new Storage(name);
+                return Storage.instance;
+            }
+            setItem(k, v) {
+                if (localStorage) localStorage.setItem(k, v)
+            }
+            getItem(k) {
+                if (localStorage) return localStorage.getItem(k)
+            }
+        }
+        //闭包法
+        let getInstance = (function(){
+            let instance = null;
+            return function(name){
+                if(!instance) instance = new Storage(name);
+                return instance
+            }
+        })();
+        let storage1 = getInstance('lzj');
+        let storage2 = getInstance('lxj');
+        storage1.setItem('name','lzj')
+        console.log(storage2.getItem('name'))
+        console.log(storage1,storage2,storage1==storage2)
+        let stge1 = Storage.getInstance('李磊');
+        let stge2 = Storage.getInstance('李雷');
+        stge1.setItem('name','李磊')
+        console.log(stge2.getItem('name'))
+        console.log(stge1,stge2,stge1==stge2)
+        
+        /**
+         * 实现一个全局唯一的Modal弹框
+        */
+        function createOnlyOneModal(){
+            let modal = document.createElement('div');
+            modal.style.width = 200+'px';
+            modal.style.height = 120+'px';
+            modal.style.position = 'absolute';
+            modal.style.left = '50%';
+            modal.style.marginLeft = -100+'px';
+            modal.style.top = '50%';
+            modal.style.marginTop = -60+'px';
+            modal.style.textAlign = 'center';
+            modal.style.border = '1px solid red';
+            modal.innerText = new Date().getTime();
+            modal.addEventListener('click',()=>{
+                modal.parentNode.removeChild(modal);
+            })
+            return modal;
+        }
+        let getInstanceModal = (function(){
+            let instance = null;
+            return function(){
+                if(!instance) instance = createOnlyOneModal();
+                return instance
+            }
+        })();
+        document.getElementById('btn').addEventListener('click',()=>{
+            let modal =  getInstanceModal();
+            document.body.appendChild(modal)
+        })
+    </script>
+</body>
+
+</html>
