@@ -16,7 +16,8 @@
     //主要记住，Object.is与===的区别，前者中，NaN与NaN相等，+0与-0不等
     /**
      * 思路：利用===判断,为true时，需要区别出+0和-0，返回false，其余返回true，为false时需要区别出NaN与NaN，返回true，其余返回false
-     * 
+     * 判断+0与-0,可以利用1/+0===infinity 1/-0===-infinity,即是1/-0!==1/+0的
+     * 判断是不是NaN，可以利用Number.isNaN方法来判断
     */
     console.log(Object.is(NaN,NaN))
     console.log(Object.is(+0,-0))
