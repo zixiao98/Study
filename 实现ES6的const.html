@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实现ES6的const</title>
+</head>
+
+<body>
+    <script>
+        /**
+         * 实现ES6的const
+         * 
+         */
+        /**
+         * const 1.有块级作用域 2.无法重复声明，3.有暂时性死区，4.声明时就要初始化，5.为常量，不能重复赋值
+         * 
+         */
+        /**
+         * 思路：1.挂载到window上
+         *      2.利用Object.defineProperty对属性操作进行getter,setter干预，(不能重复赋值)
+         *      3.Object.hasOwnProperty判断是否已经有声明（不能重复声明）
+         *      4.执行函数时候，需要同时传入值，否则报错（声明时就要初始化）
+        */
+        // console.log(ab) //ab is not defined
+        var _const = function (variable, value) {
+            if (!value) throw new Error('const 定义变量时必须同时初始化')
+            if (window.variable) throw new Error('不允许重复定义变量' + variable)
+            //挂载到window上
+            Object.defineProperty(window, variable, {
+                /**
+                 *value和writable 和set不能同时设置
+                 */
+                get: function () {
+                    if (!value) throw new Error('请勿在声明之前使用')
+                    return value
+                },
+                set: function (newVlue) {
+                    if (value) throw new Error('const 定义变量为常量，不允许重复赋值')
+                    value = newVlue;
+                }
+            })
+        }
+        _const('ab', 123)
+        var _myConst = (() => {
+            let map = {};
+            return function (variable, value) {
+                if(!value) throw new Error('必须初始化');
+                if(map.hasOwnProperty(variable)) throw new Error('不能重复声明');
+                Object.defineProperty(map,variable,{
+                    get(){
+                        return value
+                    },
+                    set(newV){
+                        if(value) throw new Error('const定义的变量为常量，不能重复赋值')
+                        value = newVlue
+                    }
+                })
+                return map
+            }
+        })()
+        // console.log(map.cjj)
+        var map = _myConst('cjj',13);
+    </script>
+</body>
+
+</html>
