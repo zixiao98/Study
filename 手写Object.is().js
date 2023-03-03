@@ -36,7 +36,9 @@
             //只需排除NaN与NaN的情况
             if(Number.isNaN(v1)&&Number.isNaN(v2)) return true
         }
-        return false
+        return false;
+        //一句话版本
+        return v1 === v2 ? !(v1 == 0 && 1 / v1 !== 1 / v2) : Number.isNaN(v1) && Number.isNaN(v2) ;
     }
     console.log('====================================');
     console.log(myObjectIs(NaN,NaN))
