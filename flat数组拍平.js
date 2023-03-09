@@ -57,3 +57,18 @@ function SpreadFlat(arr) {
     return res
 }
 console.log(SpreadFlat(arr))
+//利用队列先进先出的思想和...拓展运算符可以展开一层的特性
+function useQueue(arr){
+    let res = [];
+    while(arr.length){
+        let item = arr.shift();
+        if(Array.isArray(item)){
+            arr.unshift(...item)
+        }else{
+            res.push(item)
+        }
+    }
+    arr = res;
+    return arr
+}
+console.log(useQueue(arr))
