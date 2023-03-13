@@ -97,29 +97,56 @@ let nodelistLen = function (nodelist) {
  * @return {ListNode}
  */
 var reverseList = function (head) {
-    if (!head || !head.next) return head
+    // if (!head || !head.next) return head
+    // let next = head;
+    // let stack = [];
+    // while (next) {
+    //     stack.push({
+    //         val: next.val,
+    //         next: null
+    //     })
+    //     next = next.next;
+    // }
+    // //利用出栈构建反转链表
+    // let target = null;
+    // let nexts = null; //指向下一个next
+    // while (stack.length > 0) {
+    //     if (!target) {
+    //         nexts = target = stack.pop();
+    //     } else {
+    //         nexts.next = stack.pop();
+    //         nexts = nexts.next
+    //     }
+
+    // }
+    // return target
+    //新解法
+    if(!head) return head;
+    let res = [];
     let next = head;
-    let stack = [];
-    while (next) {
-        stack.push({
-            val: next.val,
-            next: null
-        })
-        next = next.next;
+    while(next){
+        res.push(next.val)
+        if(next.next){
+            next = next.next
+        }else{
+            break;
+        }
     }
-    //利用出栈构建反转链表
-    let target = null;
-    let nexts = null; //指向下一个next
-    while (stack.length > 0) {
-        if (!target) {
-            nexts = target = stack.pop();
-        } else {
-            nexts.next = stack.pop();
+    //重新构建链接
+    let heads = null;
+    let nexts = null;
+    let i = 0;
+    while(i<res.length){
+        if(!heads) {
+            heads =new ListNode(res[i]);
+            nexts = heads
+        }else{
+            nexts.next =new ListNode(res[i]);
             nexts = nexts.next
         }
-
+        i++
     }
-    return target
+    return heads
 };
 var reverseList = function (head) {
     if (!head || !head.next) return head; //边界处理
@@ -135,7 +162,7 @@ var reverseList = function (head) {
     return head
 
 };
-// console.log(reverseList(listNode))
+console.log(reverseList(listNode))
 
 /**
  * 合并两个升序链表
@@ -219,7 +246,7 @@ var isPalindrome = function (head) {
     }
     return true
 };
-console.log(isPalindrome(Palindrome))
+// console.log(isPalindrome(Palindrome))
 
 /**
  * 给你一个链表的头节点 head ，判断链表中是否有环。
