@@ -1,105 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
     <script>
-         /**
+        /**
          * 给定一个url数组和一个最大并发数maxNum
          * 
          * 要求每次并发请求最多只能有maxNum个，并且一个完成之后，立马发送下一个
          * 最终返回的结果数组的顺序要和url顺序一致。
          *  
+         * async await 配合 promise
+         * 
          */
 
-        // function MaxRequestAsync(urls,maxNum){
-        //     return new Promise(resolve=>{
-        //         //处理特殊情况，url为空
-        //         if(urls.length === 0){
-        //             resolve()
-        //             return;
-        //         }
-        //         //返回的结果数组
-        //         const res = [];
-        //         let index = 0;//下一个url的 下标
-        //         async function request(){//辅助发送请求函数
-        //             const i = index;//返回结果与url顺序保持一致
-        //             let url = urls[index++];
-        //             try {
-        //                 const resp =  await fetch(url);
-        //                 res[i] = resp;
-        //             } catch (error) {
-        //                 res[i] = error;
-        //             }finally{
-        //                 if(index===urls.length) {//判断是否边界
-        //                     resolve(urls)
-        //                     return;
-        //                 }
-        //                 //执行下一个请求
-        //                 request()
-        //             }
-        //         }
-        //         //控制并发个数
-        //             //需要判断urls长度是否大于maxNum
-        //         if(urls.length<maxNum) maxNum = urls.length;
-        //         for(let i =0;i<maxNum;i++){
-        //             request()
-        //         }
-        //     })
-        // }
-        
-        function QuestAsyncCtl(urls, maxSum) {
-            //首先得对参数进行判断
+        //弄30个url
+        let urls = [];
+        for (let i = 0; i < 30; i++) {
+            urls.push(`url/promise/${i+1}`)
+        }
 
-            if (!Array.isArray(urls)) return;
-            if (!typeof maxSum == 'number') return;
-
-            //返回一个promise实例
-            return new Promise((resolve) => {
-                let res = []; //返回结果
-                let index = 0; //下一个url的下标
-                //判断数组是否为空
-                if (urls.length == 0) {
-                    resolve(res)
-                    return;
-                }
-                //发送请求的辅助函数
-                async function request() {
-                    const i = index; //保存结果的下标
-                    const url = urls[index++]; //获取对应的url，并将下标指向下一个url
-                    try {
-                        const req = await fetch(url);
-                        res[i] = req;
-                    } catch (error) {
-                        res[i] = error;
-                    } finally {
-                        //是否已经完成所有请求
-                        if (index == urls.length) {
-                            resolve(res)
-                            return;
-                        }
-                        //调用下一个请求
-                        request()
+        //模拟请求
+        function request(url) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    let num = Math.floor(Math.random() * 10) % 2
+                    if (num == 0) {
+                        resolve(url + '成功了')
+                    } else {
+                        reject(url + '失败了')
                     }
-
+                }, 1000)
+            })
+        }
+        //并非请求控制函数
+        function maxRequestSync(urlArr, maxNum) {
+            return new Promise((resolve, reject) => {
+                if (!Array.isArray(urlArr)) throw TypeError('the first parameter is not a Array');
+                if (urlArr.length < 1) {
+                    return resolve(urlArr)
                 }
-
-                //并发请求并控制最大数量
-                if(urls.length<maxSum) maxSum = urls.length;
-                for (let i = 0; i < maxSum; i++) {
-                    request()
+                let syncReqArr = [];
+                let len = urlArr.length;
+                let index = 0;
+                //辅助发起请求函数
+                let req = async () => {
+                    let i = index++;
+                    try {
+                        let url = urlArr[i];
+                        let res = await request(url);
+                        console.log(res)
+                        syncReqArr[i] = res;
+                    } catch (error) {
+                        console.log(error)
+                        syncReqArr[i] = error;
+                    } finally {
+                        //判断是否已经执行完了
+                        if (index === urlArr.length) {
+                            //等待最后一个完成之后再resolve
+                            if (syncReqArr.length === urlArr.length) return resolve(syncReqArr);
+                        } else {
+                            //一个请求完成之后继续调用下一个
+                            req();
+                        }
+                    }
+                }
+                //同时并发数量控制
+                if (urlArr.length < maxNum) maxNum = urlArr.length;
+                for (let i = 0; i < maxNum; i++) {
+                    req()
                 }
             })
         }
-        let urls = [];
-        for(let i=0;i<30;i++){
-            urls.push(`url/promise/${i}`)
+        //所以请求必须都成功函数
+        async function maxRequestSyncAllSecuss(urls, maxNum, func, times = 10) {
+            times--;
+            let res = await func(urls, maxNum);
+            let newRes = [];
+            res.forEach(item => {
+                if (item.endsWith('失败了')) {
+                    newRes.push(item.substring(0, item.length - 3))
+                }
+            })
+            if (newRes.length >= 1 && times > 0) {
+                return maxRequestSyncAllSecuss(newRes, maxNum, func, times)
+            } else {
+                //返回尝试次数之后，还是失败的url数组
+                return newRes.length > 0 ? newRes : null
+            }
         }
-        QuestAsyncCtl(urls,4).then(res=>console.log(res))
+        maxRequestSyncAllSecuss(urls, 8, maxRequestSync, 5).then(res => console.log(res))
     </script>
 </body>
+
 </html>
